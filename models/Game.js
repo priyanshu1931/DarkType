@@ -18,11 +18,11 @@ const gameSchema = new mongoose.Schema({
     },
     remainingPlayers: {
         type: Number,
-        default: 4
+        default: 2
     }
 });
 
-gameSchema.statics.findOrCreateGame = async function (difficulty) {
+gameSchema.statics.findOrCreateGame = async function (difficulty, player) {
     try {
         const games = await this.find({ canJoin: true })
             .sort({ remainingPlayers: 1 }) // Sorting in ascending order of remainingPlayers
@@ -32,20 +32,22 @@ gameSchema.statics.findOrCreateGame = async function (difficulty) {
             // console.log("No game found. Creating a new game...");
 
             // Create a new game with default values
-            const newGame = await this.create({
+            const newGame = this.create({
                 text: await Text.getDocuments({ difficulty }),
-                players: [],
+                players: [player],
                 canJoin: true,
                 startTime: null,
-                remainingPlayers: 4,
+                remainingPlayers: 3,
             });
-
             // console.log("New game created:", newGame);
             return newGame;
         }
-
         const gameWithMinimumRemainingPlayers = games[0];
+        gameWithMinimumRemainingPlayers.players.push(player);
+        gameWithMinimumRemainingPlayers.remainingPlayers -= 1;
+
         // console.log("Game found:", gameWithMinimumRemainingPlayers);
+        await gameWithMinimumRemainingPlayers.save();
         return gameWithMinimumRemainingPlayers;
     } catch (error) {
         console.error("Error finding or creating the game:", error);

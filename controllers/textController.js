@@ -8,6 +8,7 @@ module.exports.getText = async function (req, res) {
         res.status(200).json({
             status: "success",
             resultSize: text.length,
+            difficulty: (req.body.difficulty || "easy"),
             data: {
                 text
             }
