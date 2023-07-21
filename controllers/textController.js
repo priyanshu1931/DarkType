@@ -3,12 +3,12 @@ const Text = require('./../models/Text')
 module.exports.getText = async function (req, res) {
     try {
         // Fetch Random Documents from database
-        const text = await Text.getDocuments(req.body);
+        const text = await Text.getDocuments(req.headers);
 
         res.status(200).json({
             status: "success",
             resultSize: text.length,
-            difficulty: (req.body.difficulty || "easy"),
+            difficulty: (req.headers.difficulty || "easy"),
             data: {
                 text
             }
