@@ -28,12 +28,17 @@ const gameSchema = new mongoose.Schema({
     playersFinished: {
         type: Number,
         default: 0
+    },
+    difficulty: {
+        type: String,
+        enum: ["easy", "medium", "hard"],
+        default: "easy"
     }
 });
 
 gameSchema.statics.findOrCreateGame = async function (difficulty, player, mode) {
     try {
-        const games = await this.find({ canJoin: true })
+        const games = await this.find({ canJoin: true, difficulty: difficulty })
             .sort({ remainingPlayers: 1 }) // Sorting in ascending order of remainingPlayers
             .limit(1); // Limiting the result to only one game, which will be the one with the minimum remainingPlayers
 
@@ -46,8 +51,8 @@ gameSchema.statics.findOrCreateGame = async function (difficulty, player, mode) 
             const newGame = this.create({
                 text: await Text.getDocuments({ difficulty }),
                 players: [player],
-                canJoin: true,
                 remainingPlayers: remainingPlayers - 1,
+                difficulty
             });
             // console.log("New game created:", newGame);
             return newGame;
