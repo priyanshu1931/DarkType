@@ -7,20 +7,23 @@ async function startGame(io, gameId, duration) {
     game.startTime = new Date().getTime();
     await game.save();
 
-    let time = duration;
+    let countDown = duration;
     const timerId = setInterval((function gameIntervalFunction() {
-        if (time >= 0) {
+        if (countDown >= 0) {
             (async () => {
                 io.to(gameId).emit('timer', {
                     message: "Time remaining.",
-                    time
+                    countDown
                 });
-                time -= 1;
+                countDown -= 1;
 
                 // If everybody finished typing before timer.
                 const game = await Game.findById(gameId);
                 if (game.playersFinished === game.players.length) {
-                    io.to(gameId).emit("updateGame", game);
+                    io.to(gameId).emit("updateGame", {
+                        message: "Game Over",
+                        game
+                    });
                     clearInterval(timerId);
                 }
             })();
@@ -37,7 +40,10 @@ async function startGame(io, gameId, duration) {
                         game.players[index].WPM = calculateWPM(endTime, startTime, player);
                     })
                     await game.save();
-                    io.to(gameId).emit("updateGame", game);
+                    io.to(gameId).emit("updateGame", {
+                        message: "Game Over",
+                        game
+                    });
                     clearInterval(timerId);
                 } catch (err) {
                     console.log(err);
@@ -102,7 +108,10 @@ module.exports.userInput = async function (io, socketId, socket, userInput, game
             player.currentWordIndex += 1;
             if (player.currentWordIndex !== game.text.length) {
                 await game.save();
-                io.to(gameId).emit("updateGame", game);
+                io.to(gameId).emit("updateGame", {
+                    message: "Game over!",
+                    game
+                });
             }
             else {
                 let endTime = new Date().getTime();
@@ -111,7 +120,10 @@ module.exports.userInput = async function (io, socketId, socket, userInput, game
                 game.playersFinished += 1;
                 if (game.playersFinished === game.players.length) game.isOver = true;
                 await game.save();
-                io.to(gameId).emit("updateGame", game);
+                io.to(gameId).emit("updateGame", {
+                    message: "Game over!",
+                    game
+                });
             }
         }
     }
