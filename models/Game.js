@@ -13,8 +13,12 @@ const gameSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    isOver: {
+        type: Boolean,
+        default: false
+    },
     startTime: {
-        type: Number,
+        type: Number
     },
     remainingPlayers: {
         type: Number,
@@ -22,9 +26,9 @@ const gameSchema = new mongoose.Schema({
     }
 });
 
-gameSchema.statics.findOrCreateGame = async function (difficulty, player) {
+gameSchema.statics.findOrCreateGame = async function (difficulty, player, mode) {
     try {
-        const games = await this.find({ canJoin: true })
+        const games = await this.find({ canJoin: true, /*difficulty*/ })
             .sort({ remainingPlayers: 1 }) // Sorting in ascending order of remainingPlayers
             .limit(1); // Limiting the result to only one game, which will be the one with the minimum remainingPlayers
 
@@ -32,12 +36,14 @@ gameSchema.statics.findOrCreateGame = async function (difficulty, player) {
             // console.log("No game found. Creating a new game...");
 
             // Create a new game with default values
+            let remainingPlayers = 4;
+            if (mode === "solo") remainingPlayers = 1;
             const newGame = this.create({
                 text: await Text.getDocuments({ difficulty }),
                 players: [player],
                 canJoin: true,
                 startTime: null,
-                remainingPlayers: 3,
+                remainingPlayers: remainingPlayers - 1,
             });
             // console.log("New game created:", newGame);
             return newGame;

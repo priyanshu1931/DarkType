@@ -2,7 +2,7 @@ require('dotenv').config();
 const http = require('http');
 const express = require('express');
 const cors = require('cors');
-// const socket_io = require('socket.io');
+const socket_io = require('socket.io');
 
 
 // Connect Database
@@ -24,19 +24,19 @@ app.use(express.json());
 
 
 // Socket
-// const io = socket_io(server);
+const io = socket_io(server);
 
 
 // Socket Functions
-// const socketFunctions = require('./socket/socketFunctions')
+const socketFunctions = require('./socket/socketFunctions')
 
 // Listening to Socket.io events
-// io.on('connection', function (socket) {
-//     console.log(`Socket ID: ${socket.id}`);
+io.on('connection', function (socket) {
+    console.log(`Socket ID: ${socket.id}`);
 
-//     socket.on('start-game', async ({ name, difficulty }) => socketFunctions.createOrJoinGame(io, socket.id, socket, name, difficulty))
-
-// });
+    socket.on('start-game', async ({ name, difficulty, mode }) => socketFunctions.createOrJoinGame(io, socket.id, socket, name, difficulty, mode));
+    socket.on('user-input', async ({ userInput, gameId }) => socketFunctions.userInput(io, socket.id, socket, userInput, gameId));
+});
 
 
 // Start Server
