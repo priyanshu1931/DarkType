@@ -18,7 +18,8 @@ const gameSchema = new mongoose.Schema({
         default: false
     },
     startTime: {
-        type: Number
+        type: Number,
+        default: -1
     },
     remainingPlayers: {
         type: Number,
