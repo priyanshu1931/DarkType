@@ -33,7 +33,10 @@ async function startGame(io, gameId, duration) {
                 try {
                     let endTime = new Date().getTime();
                     const game = await Game.findById(gameId);
-                    if (!game) clearInterval(timerId);
+                    if (!game) {
+                        clearInterval(timerId);
+                        return;
+                    }
                     let { startTime } = game;
                     game.isOver = true;
                     game.players.forEach((player, index) => {
