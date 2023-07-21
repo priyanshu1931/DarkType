@@ -1,12 +1,12 @@
 const Text = require('../models/Text');
 const Game = require('./../models/Game');
 
-async function startGame(io, gameId) {
+async function startGame(io, gameId, duration) {
     const game = await Game.findById(gameId);
     game.startTime = new Date().getTime();
     await game.save();
 
-    let time = 5;
+    let time = duration;
     const timerId = setInterval((function gameIntervalFunction() {
         if (time >= 0) {
             io.to(gameId).emit('timer', {
@@ -46,7 +46,7 @@ const calculateWPM = (endTime, startTime, player) => {
     return WPM;
 }
 
-module.exports.createOrJoinGame = async function (io, socketId, socket, name = "Anonymous", difficulty = "easy", mode = "solo") {
+module.exports.createOrJoinGame = async function (io, socketId, socket, name = "Anonymous", difficulty = "easy", mode = "solo", duration) {
     // console.log(io, socketId, name, difficulty);
     try {
         const player = { socketID: socketId, name }
@@ -74,7 +74,8 @@ module.exports.createOrJoinGame = async function (io, socketId, socket, name = "
                         message: "Game Started.",
                         game
                     });
-                    startGame(io, gameId);
+                    if (mode === "solo") startGame(io, gameId, duration);
+                    else startGame(io, gameId, 60);
                 }
             }, 1000);
         }
