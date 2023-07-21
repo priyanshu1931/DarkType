@@ -16,7 +16,7 @@ TextSchema.statics.getDocuments = async function ({ difficulty, count }) {
     try {
         const randomDocuments = await this.aggregate([
             { $match: { difficulty: (difficulty || "easy") } },
-            { $sample: { size: (count || 40) } },
+            { $sample: { size: (count || 3) } },
         ]);
         const text = randomDocuments.map((document) => document.sentence).join(' ');
         return text.split(" ").map(word => word.trim()).filter(word => word !== "");
