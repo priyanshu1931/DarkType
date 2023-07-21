@@ -23,6 +23,10 @@ const gameSchema = new mongoose.Schema({
     remainingPlayers: {
         type: Number,
         default: 2
+    },
+    playersFinished: {
+        type: Number,
+        default: 0
     }
 });
 

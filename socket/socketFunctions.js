@@ -1,6 +1,7 @@
 const Text = require('../models/Text');
 const Game = require('./../models/Game');
 
+// Starts the timer for given duration 
 async function startGame(io, gameId, duration) {
     const game = await Game.findById(gameId);
     game.startTime = new Date().getTime();
@@ -9,23 +10,31 @@ async function startGame(io, gameId, duration) {
     let time = duration;
     const timerId = setInterval((function gameIntervalFunction() {
         if (time >= 0) {
-            io.to(gameId).emit('timer', {
-                message: "Time remaining.",
-                time
-            });
-            time -= 1;
+            (async () => {
+                io.to(gameId).emit('timer', {
+                    message: "Time remaining.",
+                    time
+                });
+                time -= 1;
+
+                // If everybody finished typing before timer.
+                const game = await Game.findById(gameId);
+                if (game.playersFinished === game.players.length) {
+                    io.to(gameId).emit("updateGame", game);
+                    clearInterval(timerId);
+                }
+            })();
         }
         else {
             (async () => {
                 try {
                     let endTime = new Date().getTime();
                     const game = await Game.findById(gameId);
+                    if (!game) clearInterval(timerId);
                     let { startTime } = game;
                     game.isOver = true;
                     game.players.forEach((player, index) => {
-                        if (player.WPM === -1) {
-                            game.players[index].WPM = calculateWPM(endTime, startTime, player);
-                        }
+                        game.players[index].WPM = calculateWPM(endTime, startTime, player);
                     })
                     await game.save();
                     io.to(gameId).emit("updateGame", game);
@@ -39,6 +48,7 @@ async function startGame(io, gameId, duration) {
     })(), 1000);
 }
 
+// Calculate the speed.
 const calculateWPM = (endTime, startTime, player) => {
     const timeTaken = ((endTime - startTime) / 1000) / 60;
     const wordsTyped = player.currentWordIndex;
@@ -86,7 +96,7 @@ module.exports.createOrJoinGame = async function (io, socketId, socket, name = "
 
 module.exports.userInput = async function (io, socketId, socket, userInput, gameId) {
     const game = await Game.findById(gameId);
-    if (!game.canJoin && !game.isOver) {
+    if (game && !game.canJoin && !game.isOver) {
         const player = game.players.find((playerr) => playerr.socketID === socketId)
         if (game.text[player.currentWordIndex] === userInput.trim()) {
             player.currentWordIndex += 1;
@@ -98,10 +108,11 @@ module.exports.userInput = async function (io, socketId, socket, userInput, game
                 let endTime = new Date().getTime();
                 let { startTime } = game;
                 player.WPM = calculateWPM(endTime, startTime, player);
-                game = await game.save();
+                game.playersFinished += 1;
+                if (game.playersFinished === game.players.length) game.isOver = true;
+                await game.save();
                 io.to(gameId).emit("updateGame", game);
             }
         }
     }
-
 }
