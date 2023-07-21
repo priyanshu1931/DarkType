@@ -11,8 +11,10 @@ async function startGame(io, gameId, duration) {
     const timerId = setInterval((function gameIntervalFunction() {
         if (countDown >= 0) {
             (async () => {
+                let message = "All the best";
+                if (countDown === 0) message = "Game Over!";
                 io.to(gameId).emit('timer', {
-                    message: "Time remaining.",
+                    message: message,
                     countDown
                 });
                 countDown -= 1;
@@ -112,7 +114,7 @@ module.exports.userInput = async function (io, socketId, socket, userInput, game
             if (player.currentWordIndex !== game.text.length) {
                 await game.save();
                 io.to(gameId).emit("updateGame", {
-                    message: "Game over!",
+                    message: "continue",
                     game
                 });
             }
