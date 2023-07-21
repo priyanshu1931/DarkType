@@ -33,7 +33,7 @@ const gameSchema = new mongoose.Schema({
 
 gameSchema.statics.findOrCreateGame = async function (difficulty, player, mode) {
     try {
-        const games = await this.find({ canJoin: true, difficulty })
+        const games = await this.find({ canJoin: true })
             .sort({ remainingPlayers: 1 }) // Sorting in ascending order of remainingPlayers
             .limit(1); // Limiting the result to only one game, which will be the one with the minimum remainingPlayers
 
