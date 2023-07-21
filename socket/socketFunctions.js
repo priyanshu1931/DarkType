@@ -46,7 +46,7 @@ const calculateWPM = (endTime, startTime, player) => {
     return WPM;
 }
 
-module.exports.createOrJoinGame = async function (io, socketId, socket, name = "Anonymous", difficulty = "easy", mode = "solo", duration) {
+module.exports.createOrJoinGame = async function (io, socketId, socket, name = "Anonymous", difficulty = "easy", mode = "solo", duration = 60) {
     // console.log(io, socketId, name, difficulty);
     try {
         const player = { socketID: socketId, name }
