@@ -47,7 +47,6 @@ gameSchema.statics.findOrCreateGame = async function (difficulty, player, mode) 
                 text: await Text.getDocuments({ difficulty }),
                 players: [player],
                 canJoin: true,
-                startTime: null,
                 remainingPlayers: remainingPlayers - 1,
             });
             // console.log("New game created:", newGame);
