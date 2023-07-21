@@ -34,7 +34,7 @@ const socketFunctions = require('./socket/socketFunctions')
 io.on('connection', function (socket) {
     console.log(`Socket ID: ${socket.id}`);
 
-    socket.on('start-game', async ({ name, difficulty, mode }) => socketFunctions.createOrJoinGame(io, socket.id, socket, name, difficulty, mode, duration = 60));
+    socket.on('start-game', async ({ name, difficulty, mode, duration }) => socketFunctions.createOrJoinGame(io, socket.id, socket, name, difficulty, mode, duration = 60));
     socket.on('user-input', async ({ userInput, gameId }) => socketFunctions.userInput(io, socket.id, socket, userInput, gameId));
 });
 
