@@ -49,7 +49,7 @@ gameSchema.statics.findOrCreateGame = async function (difficulty, player, mode) 
             let remainingPlayers = 4;
             if (mode === "solo") remainingPlayers = 1;
             const newGame = this.create({
-                text: await Text.getDocuments({ difficulty }),
+                text: await Text.getDocuments({ difficulty, count: 3 }),
                 players: [player],
                 remainingPlayers: remainingPlayers - 1,
                 difficulty
