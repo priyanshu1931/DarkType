@@ -1,0 +1,21 @@
+Backend (NodeJS, ExpressJS, MongoDB, Socket.io):
+
+1. https://socket.io/docs/v3/emitting-events/
+2. https://socket.io/docs/v3/listening-to-events/
+3. https://socket.io/docs/v3/broadcasting-events/
+4. https://socket.io/docs/v3/rooms/
+5. ChatGPT: https://chat.openai.com/
+6. https://www.geeksforgeeks.org/immediately-invoked-function-expressions-iife-in-javascript/
+
+
+
+
+Frontend (Flutter):
+
+1. https://www.youtube.com/watch?v=DabC5B508tQ
+
+
+
+
+Hosting: https://render.com/
+Backend Hosted URL: https://darktype.onrender.com
